@@ -1,11 +1,13 @@
-import sys
 #from colorama import init, Fore  # disable before test as Jetbrains don't have it installed
 
+
+import sys
+
+sys.setrecursionlimit(50)
 #init(autoreset=True)
 
 
-sys.setrecursionlimit(50)
-
+only_beginning = False
 
 def metachar_preprocessing(_string, _template):
     if _template:
@@ -14,13 +16,20 @@ def metachar_preprocessing(_string, _template):
             return main()
         if _template[0] == "^":
             _template = _template[1:]
-            _string = _string[:len(_template)]
+            global only_beginning
+            only_beginning = True
+            # _string = _string[:len(_template)]  # no longer works as * and + implemented
+
         if _template[-1] == "$":
+            #print("LINE 24", _template, _string)
             if not char_match(_template[-2], _string[-1]):
+                #print("Line 24 FALSE")
                 return "a", "b"  # temporarily fix to repr "FALSE"
             else:
-                _template = _template[:-1]
-                _string = _string[-len(_template):]
+                pass
+                #_template = _template[:-1]
+                #_string = _string[-len(_template):]
+
     return _template, _string
 
 
@@ -49,6 +58,8 @@ def string_match(_template, _string):
 
                 # maybe rethink next_symbol check and inplement below as well?
                 elif "*" in _template:
+                    # print(_template, _string)
+
                     next_step = 1 if _template[i] == "*" else 2
                     """repeative letter case"""
                     if _template[i-1] == _string[i]:  # repeative letter case
@@ -56,11 +67,16 @@ def string_match(_template, _string):
                         return full_match(_template[i + next_step::], _string[i::])
 
                     elif _template[i-1] == ".":
+                        next_letter = _template[i+1]
+                        next_letter_index = _string.find(next_letter)
+
                         # removing repittive chars.
-                        _string = _string[:i] + _string[i::].strip(_string[i])
+                        _string = _string[:i] + _string[next_letter_index]
 
                         _template = _template[i+1::]
                         _string = _string[i+1::]
+                        # print(_template, _string)
+
                         return string_match(_template, _string)
 
                     elif _template[i+1] == _string[i]:  # abscent letter case
@@ -72,19 +88,28 @@ def string_match(_template, _string):
                         return full_match(_template[i + next_step::], _string[i::])
 
                 elif "+" in _template:
-                    # step
-                    #print(_template, _string)
+                    # print(_template, _string)
 
-                    _template = _template[:i+1] + _template[i+2:]
-                    _string = _string[:i] + _string[i::].strip(_string[i-1])  # right template version
+                    if _template[i] == "+":
+                        # print(_template, _string)
 
-                    i += 1
-                    # implement next letter check, and allow
+                        # print("NEXT STEP IS:", next_step)
 
-                    #print(_template, _string)
-                    #exit()
+                        _template = _template[:i] + _template[i+1:]
 
-                    return full_match(_template, _string)
+
+                        _string = _string[:i] + _string[i::].strip(_string[i-1])  # right template version
+
+                        i += 1
+                        # implement next letter check, and allow
+
+                        #print(_template, _string)
+                        #exit()
+                        return string_match(_template, _string)
+                    return False
+
+                elif _template[i] == '$' and _string[i::] != "":
+                    return False
 
                 else:  # in none of IFs triggered
                     return False
@@ -119,6 +144,9 @@ def full_match(_template, _string, i=0):
     if string_match(_template, _string):
         return True
 
+    elif only_beginning:
+        return False
+
     else:
         i = 1
         # creating the loop and checking if template can be found in string
@@ -134,16 +162,20 @@ def main():
 
     try:
         template, string = input().split("|")
-        # template, string = "colou+r|color".split("|")
+        # template, string = "^.*c$|abcDEFc".split("|")
 
     except ValueError:
         print("ERROR! Input should be like a|a. Please try again")
         return main()
     template, string = metachar_preprocessing(string, template)
+
     print(full_match(template, string))
 
 
 def run_tests():
+
+
+
     # test input -> answer
     test_pool = {'colou?r|color': True,
                  'colo+r|color': True,
@@ -158,6 +190,10 @@ def run_tests():
                  'col.*r|collar': True,
                  'col.*r$|colors': False,
                  'colou+r|color': False,
+                 'colo+r|color': True,
+                 '^no+pe$|noooooooope': True,
+                 '^apple$|apple pie': False,
+                 '^.*c$|abcabc': True,
                  }
 
     for pair in test_pool.keys():
@@ -169,4 +205,7 @@ def run_tests():
 
 if __name__ == '__main__':
     main()
-    #run_tests()
+    # run_tests()
+
+
+# ^no+pe$ noooooooope great example to not allow recursion in full match in such cases.
