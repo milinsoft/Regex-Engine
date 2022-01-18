@@ -83,8 +83,27 @@ files:
   visible: true
   learner_created: true
 feedback_link: https://hyperskill.org/learn/step/10242#comment
-status: Solved
+status: Failed
 feedback:
-  message: Congratulations!
-  time: Tue, 18 Jan 2022 16:44:01 UTC
+  message: |-
+    Wrong answer in test #1
+
+    Two identical patterns should return True!
+
+    Please find below the output of your program during this failed test.
+
+    ---
+
+    colou?r|color passed
+    colou?r|colour passed
+    colou?r|colouur passed
+    colou*r|color passed
+    colou*r|colour passed
+    colou*r|colouur passed
+    col.*r|color passed
+    col.*r|colour passed
+    col.*r|colr passed
+    col.*r|collar passed
+    col.*r$|colors passed
+  time: Tue, 18 Jan 2022 16:54:55 UTC
 record: 4
