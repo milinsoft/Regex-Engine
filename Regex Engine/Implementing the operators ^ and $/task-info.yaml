@@ -79,9 +79,12 @@ files:
     if __name__ == '__main__':
         RegexTest('regex.regex').run_tests()
   learner_created: false
+- name: regex/notes
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/10242#comment
 status: Solved
 feedback:
   message: Congratulations!
-  time: Sun, 16 Jan 2022 12:47:31 UTC
+  time: Tue, 18 Jan 2022 16:44:01 UTC
 record: 4
