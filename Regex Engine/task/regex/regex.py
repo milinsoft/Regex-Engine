@@ -18,18 +18,11 @@ def metachar_preprocessing(_string, _template):
             _template = _template[1:]
             global only_beginning
             only_beginning = True
-            # _string = _string[:len(_template)]  # no longer works as * and + implemented
 
         if _template[-1] == "$":
-            #print("LINE 24", _template, _string)
             if not char_match(_template[-2], _string[-1]):
-                #print("Line 24 FALSE")
-                return "a", "b"  # temporarily fix to repr "FALSE"
-            else:
-                pass
-                #_template = _template[:-1]
-                #_string = _string[-len(_template):]
 
+                return "a", "b"  # temporarily fix to repr "FALSE"
     return _template, _string
 
 
