@@ -1,13 +1,14 @@
-#from colorama import init, Fore  # disable before test as Jetbrains don't have it installed
+from colorama import init, Fore  # disable before test as Jetbrains don't have it installed
 
 
 import sys
 
 sys.setrecursionlimit(50)
-#init(autoreset=True)
+init(autoreset=True)
 
 
 only_beginning = False
+
 
 def metachar_preprocessing(_string, _template):
     if _template:
@@ -21,7 +22,6 @@ def metachar_preprocessing(_string, _template):
 
         if _template[-1] == "$":
             if not char_match(_template[-2], _string[-1]):
-
                 return "a", "b"  # temporarily fix to repr "FALSE"
     return _template, _string
 
@@ -42,7 +42,8 @@ def string_match(_template, _string):
                     next_step = 1 if _template[i] == "?" else 2
 
                     # do not make it recursive
-                    next_symbol_check = char_match(_template[i + next_step], _string[i])  # skipping '?' and comparing next mandatory sign, test 'ca?t|cat'
+                    next_symbol_check = char_match(_template[i + next_step], _string[
+                        i])  # skipping '?' and comparing next mandatory sign, test 'ca?t|cat'
                     if not next_symbol_check:  # problem  that this variable doesn't change it's name
                         return False
                     i += 1
@@ -55,28 +56,28 @@ def string_match(_template, _string):
 
                     next_step = 1 if _template[i] == "*" else 2
                     """repeative letter case"""
-                    if _template[i-1] == _string[i]:  # repeative letter case
-                        _string = _string[:i] + _string[i::].strip(_template[i-1])  # cut repittive leters in _string
+                    if _template[i - 1] == _string[i]:  # repeative letter case
+                        _string = _string[:i] + _string[i::].strip(_template[i - 1])  # cut repittive leters in _string
                         return full_match(_template[i + next_step::], _string[i::])
 
-                    elif _template[i-1] == ".":
-                        next_letter = _template[i+1]
+                    elif _template[i - 1] == ".":
+                        next_letter = _template[i + 1]
                         next_letter_index = _string.find(next_letter)
 
                         # removing repittive chars.
                         _string = _string[:i] + _string[next_letter_index]
 
-                        _template = _template[i+1::]
-                        _string = _string[i+1::]
+                        _template = _template[i + 1::]
+                        _string = _string[i + 1::]
                         # print(_template, _string)
 
                         return string_match(_template, _string)
 
-                    elif _template[i+1] == _string[i]:  # abscent letter case
+                    elif _template[i + 1] == _string[i]:  # abscent letter case
                         """abscent letter case """
-                        return full_match(_template[i+1::], _string[i::])
+                        return full_match(_template[i + 1::], _string[i::])
 
-                    elif _template[i+1] == _string[i]:  # 0 repititions, (letter presented only once here)
+                    elif _template[i + 1] == _string[i]:  # 0 repititions, (letter presented only once here)
                         """0 repititions"""
                         return full_match(_template[i + next_step::], _string[i::])
 
@@ -88,16 +89,15 @@ def string_match(_template, _string):
 
                         # print("NEXT STEP IS:", next_step)
 
-                        _template = _template[:i] + _template[i+1:]
+                        _template = _template[:i] + _template[i + 1:]
 
-
-                        _string = _string[:i] + _string[i::].strip(_string[i-1])  # right template version
+                        _string = _string[:i] + _string[i::].strip(_string[i - 1])  # right template version
 
                         i += 1
                         # implement next letter check, and allow
 
-                        #print(_template, _string)
-                        #exit()
+                        # print(_template, _string)
+                        # exit()
                         return string_match(_template, _string)
                     return False
 
@@ -122,7 +122,7 @@ def template_without_optional_chars(_template):
     return _template
 
 
-def full_match(_template, _string, i=0):
+def full_match(_template, _string):
     # if _template and not _string - checking if _template will still be True after removing optional characters.
     if _template and not _string:
         if template_without_optional_chars(_template):
@@ -152,7 +152,6 @@ def full_match(_template, _string, i=0):
 
 
 def main():
-
     try:
         template, string = input().split("|")
         # template, string = "^.*c$|abcDEFc".split("|")
@@ -166,12 +165,8 @@ def main():
 
 
 def run_tests():
-
-
-
     # test input -> answer
     test_pool = {'colou?r|color': True,
-                 'colo+r|color': True,
                  'colou?r|colour': True,
                  'colou?r|colouur': False,
                  'colou*r|color': True,
@@ -187,18 +182,24 @@ def run_tests():
                  '^no+pe$|noooooooope': True,
                  '^apple$|apple pie': False,
                  '^.*c$|abcabc': True,
+                 r'\.$|end.': True,
+                 r'3\+3|3+3=6': True,
+                 r'\?|Is this working?': True,
+                 '\\|\\': True,
+                 r'colou\?r|color': False,
+                 r'colou\?r|colour': False,
                  }
 
     for pair in test_pool.keys():
         template, string = pair.split("|")
         template, string = metachar_preprocessing(string, template)
         # print(f"templ: {template}, str: {string}, expected result {test_pool[pair]}, actual result: {full_match(template, string)}")
-        print(f"{pair} {Fore.GREEN}passed" if full_match(template, string) == test_pool[pair] else f"{pair} {Fore.RED}failed")
+        print(f"{pair} {Fore.GREEN}passed" if full_match(template, string) == test_pool[
+            pair] else f"{pair} {Fore.RED}failed")
 
 
 if __name__ == '__main__':
-    main()
-    # run_tests()
-
+    # main()
+    run_tests()
 
 # ^no+pe$ noooooooope great example to not allow recursion in full match in such cases.
