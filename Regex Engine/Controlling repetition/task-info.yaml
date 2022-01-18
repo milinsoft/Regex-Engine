@@ -114,12 +114,22 @@ files:
     if __name__ == '__main__':
         RegexTest('regex.regex').run_tests()
   learner_created: false
-- name: regex/test.py
+- name: regex/notes
   visible: true
   learner_created: true
 feedback_link: https://hyperskill.org/learn/step/10243#comment
 status: Failed
 feedback:
-  message: Syntax Error
-  time: Sun, 16 Jan 2022 12:47:26 UTC
+  message: |-
+    Error in test #37
+
+    In this test, the program is running for a long time, more than 15 seconds. Most likely, the program has gone into an infinite loop.
+
+    Please find below the output of your program during this failed test.
+    Note that the '>' character indicates the beginning of the input line.
+
+    ---
+
+    > colou*r|color
+  time: Tue, 18 Jan 2022 18:25:21 UTC
 record: 5

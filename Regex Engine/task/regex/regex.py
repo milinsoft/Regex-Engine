@@ -1,5 +1,5 @@
 import sys
-from colorama import init, Fore
+from colorama import init, Fore  # disable before test as Jetbrains don't have it installed
 
 init(autoreset=True)
 
@@ -35,7 +35,6 @@ def string_match(_template, _string):
     for i in range(loop_range):
         try:
             if not char_match(_template[i], _string[i]):
-                #print(f"line #36: {_template[i]} doesn't match {_string[i]}\n")
 
                 if "?" in _template:
                     next_step = 1 if _template[i] == "?" else 2
@@ -48,10 +47,8 @@ def string_match(_template, _string):
                     if i == loop_range:
                         return True
 
-                    # return full_match(_template[i + next_step::], _string[i::])
-
                 # maybe rethink next_symbol check and inplement below as well?
-                if "*" in _template:
+                elif "*" in _template:
                     next_step = 1 if _template[i] == "*" else 2
                     """repeative letter case"""
                     if _template[i-1] == _string[i]:  # repeative letter case
@@ -60,22 +57,25 @@ def string_match(_template, _string):
 
                     elif _template[i-1] == ".":
                         # removing repittive chars.
-                        _string = _string[:i+1] + _string[i+1::].strip(_string[i])
+                        _string = _string[:i] + _string[i::].strip(_string[i])
 
                         _template = _template[i+1::]
                         _string = _string[i+1::]
-
-
                         return string_match(_template, _string)
 
                     elif _template[i+1] == _string[i]:  # abscent letter case
+                        """abscent letter case """
                         return full_match(_template[i+1::], _string[i::])
 
-
                     elif _template[i+1] == _string[i]:  # 0 repititions, (letter presented only once here)
+                        """0 repititions"""
                         return full_match(_template[i + next_step::], _string[i::])
 
-                    i += 1
+                elif "+" in _template:
+                    _string = _string[:i] + _string[i::].strip(_string[i-1])  # right template version
+                    _template = _template[:i] + _template[i+1]
+                    return full_match(_template, _string)
+
                 else:  # in none of IFs triggered
                     return False
 
@@ -106,12 +106,10 @@ def full_match(_template, _string, i=0):
     elif not _template:
         return True
 
-
     if string_match(_template, _string):
         return True
 
     else:
-
         i = 1
         # creating the loop and checking if template can be found in string
         while i < len(_string):
@@ -125,8 +123,8 @@ def full_match(_template, _string, i=0):
 def main():
 
     try:
-        #template, string = input().split("|")
-        template, string = "colou?r|colouur".split("|")
+        template, string = input().split("|")
+        # template, string = "colo+r|coloooooooor".split("|")
     except ValueError:
         print("ERROR! Input should be like a|a. Please try again")
         return main()
@@ -137,6 +135,7 @@ def main():
 def run_tests():
     # test input -> answer
     test_pool = {'colou?r|color': True,
+                 'colo+r|color': True,
                  'colou?r|colour': True,
                  'colou?r|colouur': False,
                  'colou*r|color': True,
@@ -157,5 +156,5 @@ def run_tests():
 
 
 if __name__ == '__main__':
-    #main()
+    # main()
     run_tests()
