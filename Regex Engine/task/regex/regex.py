@@ -1,7 +1,7 @@
 import sys
-from colorama import init, Fore  # disable before test as Jetbrains don't have it installed
+#from colorama import init, Fore  # disable before test as Jetbrains don't have it installed
 
-init(autoreset=True)
+#init(autoreset=True)
 
 
 sys.setrecursionlimit(50)
@@ -72,8 +72,18 @@ def string_match(_template, _string):
                         return full_match(_template[i + next_step::], _string[i::])
 
                 elif "+" in _template:
+                    # step
+                    #print(_template, _string)
+
+                    _template = _template[:i+1] + _template[i+2:]
                     _string = _string[:i] + _string[i::].strip(_string[i-1])  # right template version
-                    _template = _template[:i] + _template[i+1]
+
+                    i += 1
+                    # implement next letter check, and allow
+
+                    #print(_template, _string)
+                    #exit()
+
                     return full_match(_template, _string)
 
                 else:  # in none of IFs triggered
@@ -124,7 +134,8 @@ def main():
 
     try:
         template, string = input().split("|")
-        # template, string = "colo+r|coloooooooor".split("|")
+        # template, string = "colou+r|color".split("|")
+
     except ValueError:
         print("ERROR! Input should be like a|a. Please try again")
         return main()
@@ -146,6 +157,7 @@ def run_tests():
                  'col.*r|colr': True,
                  'col.*r|collar': True,
                  'col.*r$|colors': False,
+                 'colou+r|color': False,
                  }
 
     for pair in test_pool.keys():
@@ -156,5 +168,5 @@ def run_tests():
 
 
 if __name__ == '__main__':
-    # main()
-    run_tests()
+    main()
+    #run_tests()
