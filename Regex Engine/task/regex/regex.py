@@ -31,14 +31,36 @@ def char_match(_regex_char, _char) -> bool:
 
 
 def string_match(_template, _string):
-    loop_range = min([len(_template), len(_string)])
+    loop_range = len(_string)
     # print(f"checking {_template, _string}")
 
     for i in range(loop_range):
         try:
             if not char_match(_template[i], _string[i]):
 
-                if "?" in _template:
+                if _template[i] == '\\':
+                    print("ORIG:", _template, _string)
+                    print("NOT MATCH:", _template[i], _string[i])
+                    print("TRYING TO MATCH:", _template[i+1], _string[i])
+
+                    next_step = 1 if _template[i+1] not in "?*+=." else 2
+                    "\\.$|end."
+
+
+                    # print(f"Input words: {_template[i+1]} {_string[i+1]} ")
+                    print('match result:', _template[i+1] == _string[i])
+                    print("new template and string can be: ", _template[i+2:], _string[i+1:], "\n")
+
+                    if _template[i+1] != _string[i]:
+                        #print(_template[i+1], _string[i])
+                        return False
+                    else:
+                        i += 1
+                        # check len == i and len or i-1 and -1 == "$" and return True
+                        return full_match(_template[i+2:], _string[i+1:])
+
+
+                elif "?" in _template:
                     next_step = 1 if _template[i] == "?" else 2
 
                     # do not make it recursive
@@ -106,9 +128,9 @@ def string_match(_template, _string):
 
                 else:  # in none of IFs triggered
                     return False
-
         except IndexError:
             return _template[i] == _template[-1] == '?'  # should be True :)
+
     return True
 
 
@@ -144,6 +166,7 @@ def full_match(_template, _string):
         i = 1
         # creating the loop and checking if template can be found in string
         while i < len(_string):
+            print(f"Iteration # {i}")
 
             if string_match(_template, _string[i:]):
                 return True
@@ -153,8 +176,8 @@ def full_match(_template, _string):
 
 def main():
     try:
-        template, string = input().split("|")
-        # template, string = "^.*c$|abcDEFc".split("|")
+        # template, string = input().split("|")
+        template, string = "\\.$|end.".split("|")
 
     except ValueError:
         print("ERROR! Input should be like a|a. Please try again")
@@ -182,12 +205,12 @@ def run_tests():
                  '^no+pe$|noooooooope': True,
                  '^apple$|apple pie': False,
                  '^.*c$|abcabc': True,
-                 r'\.$|end.': True,
-                 r'3\+3|3+3=6': True,
-                 r'\?|Is this working?': True,
+                 '\\.$|end.': True,
+                 '3\\+3|3+3=6': True,
+                 '\\?|Is this working?': True,
                  '\\|\\': True,
-                 r'colou\?r|color': False,
-                 r'colou\?r|colour': False,
+                 'colou\\?r|color': False,
+                 'colou\\?r|colour': False,
                  }
 
     for pair in test_pool.keys():
