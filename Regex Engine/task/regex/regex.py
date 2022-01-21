@@ -1,14 +1,16 @@
-from colorama import init, Fore  # disable before test as Jetbrains don't have it installed
+#from colorama import init, Fore  # disable before test as Jetbrains don't have it installed
 
 
 import sys
 
 sys.setrecursionlimit(50)
-init(autoreset=True)
+#init(autoreset=True)
 
 
 only_beginning = False
 
+
+# if len(template) < len(string) and template[-1] == "$", strip "$"!2
 
 def metachar_preprocessing(_string, _template):
     if _template:
@@ -35,28 +37,44 @@ def string_match(_template, _string):
     # print(f"checking {_template, _string}")
 
     for i in range(loop_range):
+        #print("loop starts with:", _template, _string)
         try:
             if not char_match(_template[i], _string[i]):
 
                 if _template[i] == '\\':
-                    print("ORIG:", _template, _string)
-                    print("NOT MATCH:", _template[i], _string[i])
-                    print("TRYING TO MATCH:", _template[i+1], _string[i])
+                    #print("ORIG:", _template, _string)
+                    #print("NOT MATCH:", _template[i], _string[i])
+                    #print("TRYING TO MATCH:", _template[i+1], _string[i])
 
                     next_step = 1 if _template[i+1] not in "?*+=." else 2
                     "\\.$|end."
 
 
                     # print(f"Input words: {_template[i+1]} {_string[i+1]} ")
-                    print('match result:', _template[i+1] == _string[i])
-                    print("new template and string can be: ", _template[i+2:], _string[i+1:], "\n")
+                    #print('match result:', _template[i+1] == _string[i])
+                    #print("new template and string can be: ", _template[i+2:], _string[i+1:], "\n")
 
                     if _template[i+1] != _string[i]:
                         #print(_template[i+1], _string[i])
                         return False
                     else:
-                        i += 1
-                        # check len == i and len or i-1 and -1 == "$" and return True
+                        try:
+                            a = _template[i + 1 + 1]
+                        except IndexError:
+                            return True
+
+
+                        if _template[i+2] == "$" or len(_template[i+1]) == i+1:
+                            return True
+
+                        #if len(_template) == i or len(_template) == i-1 and _template[i+1] == "$":
+                        #    return True
+
+                        # print("line 62:", _template[i+2], _string[i+1])
+                        # i += 1
+                        if _template[i+2] == "$" and not _string[i+1]:
+                            return True
+
                         return full_match(_template[i+2:], _string[i+1:])
 
 
@@ -123,14 +141,16 @@ def string_match(_template, _string):
                         return string_match(_template, _string)
                     return False
 
-                elif _template[i] == '$' and _string[i::] != "":
+                elif _template[i] == '$' and not _string:
                     return False
 
                 else:  # in none of IFs triggered
                     return False
         except IndexError:
             return _template[i] == _template[-1] == '?'  # should be True :)
-
+        else:
+            if i == len(_template) - 1:
+                return True
     return True
 
 
@@ -166,18 +186,22 @@ def full_match(_template, _string):
         i = 1
         # creating the loop and checking if template can be found in string
         while i < len(_string):
-            print(f"Iteration # {i}")
+            #print(Fore.RED + f"i == {i}")
+            #print(f"Iteration # {i}")
 
             if string_match(_template, _string[i:]):
                 return True
-            i += 1
+            else:
+                if len(_string[i]) < len(_template) and _string[i] == "$":
+                    return True
+                i += 1
         return False
 
 
 def main():
     try:
-        # template, string = input().split("|")
-        template, string = "\\.$|end.".split("|")
+        template, string = input().split("|")
+        #template, string = "\\.$|end.".split("|")
 
     except ValueError:
         print("ERROR! Input should be like a|a. Please try again")
@@ -189,7 +213,9 @@ def main():
 
 def run_tests():
     # test input -> answer
-    test_pool = {'colou?r|color': True,
+    test_pool = {'\\?|Is this working?': True,
+                 '\\.$|end.': True,
+                 'colou?r|color': True,
                  'colou?r|colour': True,
                  'colou?r|colouur': False,
                  'colou*r|color': True,
@@ -205,9 +231,7 @@ def run_tests():
                  '^no+pe$|noooooooope': True,
                  '^apple$|apple pie': False,
                  '^.*c$|abcabc': True,
-                 '\\.$|end.': True,
                  '3\\+3|3+3=6': True,
-                 '\\?|Is this working?': True,
                  '\\|\\': True,
                  'colou\\?r|color': False,
                  'colou\\?r|colour': False,
@@ -222,7 +246,10 @@ def run_tests():
 
 
 if __name__ == '__main__':
-    # main()
-    run_tests()
+    main()
+    #run_tests()
+
+
+# from string match need to return to full match with recalculated index
 
 # ^no+pe$ noooooooope great example to not allow recursion in full match in such cases.
