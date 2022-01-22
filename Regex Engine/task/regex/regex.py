@@ -32,6 +32,7 @@ class RegexEngine:
             try:
                 if not RegexEngine.char_match(_template[i], _string[i]):
                     match = False
+
                     if _template[i] == "$" and _string[i]:
                         return False
 
@@ -75,17 +76,15 @@ class RegexEngine:
                             """0 repititions"""
                             return self.full_match(_template[i + next_step::], _string[i::])
 
-                    elif "+" in _template:
-                        if _template[i] == "+":
-                            _template = _template[:i] + _template[i + 1:]
-                            _string = _string[:i] + _string[i::].strip(_string[i - 1])  # right template version
-                            match = True
-                            #print(_template, _string)
-                            return self.full_match(_template, _string)
-                        return False
+                    elif _template[i] == "+":
+                        _template = _template.replace("+", "")
+                        _string = _string[:i] + _string[i::].strip(_string[i - 1])  # right template version
+                        return self.full_match(_template, _string)
                     return False
             except IndexError:
+
                 return match
+        # in case all letters passed without any interventions
         return True
 
     def template_without_optional_chars(self, _template):
@@ -121,7 +120,6 @@ class RegexEngine:
             return False
 
         else:
-
             i = 1
             # creating the loop and checking if template can be found in string
             while i < len(_string):
