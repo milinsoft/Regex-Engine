@@ -26,30 +26,26 @@ class RegexEngine:
             _next_step = 1 if _template[i] == "*" else 2
             """repeative letter case"""
             if _template[i - 1] == _string[i]:  # repeative letter case
-                _string = _string[:i] + _string[i::].strip(_template[i - 1])  # cut repittive leters in _string
-                _template = _template[:i] + _template[i + _next_step::]
+                new_string = _string[:i] + _string[i::].strip(_template[i - 1])  # cut repittive leters in _string
+                new_template = _template[:i] + _template[i + _next_step::]
 
-                return self.full_match(_string, _template)
+                return self.full_match(new_string, new_template)
 
             elif _template[i - 1] == ".":
                 next_letter_index = _string.find(_template[i + 1])
 
                 # removing repittive chars.
-                _string = _string[:i] + _string[next_letter_index]
-                return self.full_match(_template, _string)
+                new_string = _string[:i] + _string[next_letter_index]
+                return self.full_match(_template, new_string)
 
             elif _template[i + 1] == _string[i]:  # abscent letter case
                 """abscent letter case """
                 # re-write variables?
-                _template = _template[i + 1::]
-                _string = _string[i::]
-
-                return self.full_match(_template, _string)
+                return self.full_match(_template[i + 1::], _string[i::])
 
             elif _template[i + 1] == _string[i]:  # 0 repititions, (letter presented only once here)
                 """0 repititions"""
-                _template = _template.replace("*", "")
-                return self.full_match(_template, _string)
+                return self.full_match(_template.replace("*", ""), _string)
 
         def questionmark_handler(_template, _string):
             if _template[i] == "?":
