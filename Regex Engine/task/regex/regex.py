@@ -27,20 +27,29 @@ class RegexEngine:
     def substring_match(self, _template=None, _string=None):
 
         for i in range(len(_string)):
+            match = True
+
             try:
                 if not RegexEngine.char_match(_template[i], _string[i]):
-                    if _template[i] == '\\':
+                    match = False
+                    if _template[i] == "$" and _string[i]:
+                        return False
+
+                    elif _template[i] == '\\':
                         return False if _template[i+1] != _string[i]\
                             else self.full_match(_template[i+2:], _string[i+1:])
 
                     elif "?" in _template:
-                        next_step = 1 if _template[i] == "?" else 2
 
-                        # do not make it recursive
-                        next_symbol_check = self.char_match(_template[i + next_step], _string[
-                            i])  # skipping '?' and comparing next mandatory sign, test 'ca?t|cat'
-                        if not next_symbol_check:  # problem  that this variable doesn't change it's name
+                        if _template[i] == "?":
+                            next_step = 1
+
+                        elif len(_template) > i and _template[i+1] == "?":
+                            next_step = 2
+                        else:
                             return False
+
+                        return self.substring_match(_template[i+next_step:], _string[i:])
 
                     elif "*" in _template:
                         next_step = 1 if _template[i] == "*" else 2
@@ -51,8 +60,7 @@ class RegexEngine:
                             return self.full_match(_string, _template)
 
                         elif _template[i - 1] == ".":
-                            next_letter = _template[i + 1]
-                            next_letter_index = _string.find(next_letter)
+                            next_letter_index = _string.find(_template[i + 1])
 
                             # removing repittive chars.
                             _string = _string[:i] + _string[next_letter_index]
@@ -71,16 +79,13 @@ class RegexEngine:
                         if _template[i] == "+":
                             _template = _template[:i] + _template[i + 1:]
                             _string = _string[:i] + _string[i::].strip(_string[i - 1])  # right template version
+                            match = True
+                            #print(_template, _string)
                             return self.full_match(_template, _string)
                         return False
-
-                    elif _template[i] == '$' and not _string:
-                        return True
-
-                    else:  # in none of IFs triggered
-                        return False
+                    return False
             except IndexError:
-                pass
+                return match
         return True
 
     def template_without_optional_chars(self, _template):
@@ -116,17 +121,20 @@ class RegexEngine:
             return False
 
         else:
+
             i = 1
             # creating the loop and checking if template can be found in string
-            for i in range(len(_string)):
+            while i < len(_string):
                 if self.substring_match(_template, _string[i:]):
                     return True
+                i += 1
             return False
 
 
 def main():
     try:
         template, string = input().split("|")
+        #template, string = "^no+|noooooooope".split("|")
     except ValueError:
         print("ERROR! Input should be like a|a. Please try again")
         return main()

@@ -205,6 +205,7 @@ def run_tests():
                  '\\|\\': True,
                  'colou\\?r|color': False,
                  'colou\\?r|colour': False,
+                 'colou?rama|colorama': True,
                  }
 
     for pair in test_pool.keys():
@@ -223,3 +224,12 @@ if __name__ == '__main__':
 # from string match need to return to full match with recalculated index
 
 # ^no+pe$ noooooooope great example to not allow recursion in full match in such cases.
+
+
+# colou?rama|colorama
+
+colou?r|xxxcolour
+
+colou?r|xxxcolouur
+
+^no+|noooooooope
