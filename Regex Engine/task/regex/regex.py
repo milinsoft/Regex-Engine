@@ -22,6 +22,7 @@ class RegexEngine:
     def substring_match(self, _template=None, _string=None) -> bool:
 
         def asterisk_handler(_template, _string):
+
             _next_step = 1 if _template[i] == "*" else 2
             """repeative letter case"""
             if _template[i - 1] == _string[i]:  # repeative letter case
@@ -40,12 +41,15 @@ class RegexEngine:
             elif _template[i + 1] == _string[i]:  # abscent letter case
                 """abscent letter case """
                 # re-write variables?
-                return self.full_match(_template[i + 1::], _string[i::])
+                _template = _template[i + 1::]
+                _string = _string[i::]
+
+                return self.full_match(_template, _string)
 
             elif _template[i + 1] == _string[i]:  # 0 repititions, (letter presented only once here)
                 """0 repititions"""
-                return self.full_match(_template[i + next_step::], _string[i::])
-
+                _template = _template.replace("*", "")
+                return self.full_match(_template, _string)
 
         def questionmark_handler(_template, _string):
             if _template[i] == "?":
@@ -58,6 +62,11 @@ class RegexEngine:
 
             return self.substring_match(_template[i + next_step:], _string[i:])
 
+        def plus_sign_handler(_template, _string):
+            _template = _template.replace("+", "")
+
+            _string = _string[:i] + _string[i::].strip(_string[i - 1])  # right template version
+            return self.full_match(_template, _string)
 
         for i in range(len(_string)):
 
@@ -78,14 +87,12 @@ class RegexEngine:
                     elif "?" in _template:
                         return questionmark_handler(_template, _string)
 
-
                     elif "*" in _template:
                         return asterisk_handler(_template, _string)
 
                     elif _template[i] == "+":
-                        _template = _template.replace("+", "")
-                        _string = _string[:i] + _string[i::].strip(_string[i - 1])  # right template version
-                        return self.full_match(_template, _string)
+                        return plus_sign_handler(_template, _string)
+
                     return False
             except IndexError:
                 return match
