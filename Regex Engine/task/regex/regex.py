@@ -15,24 +15,59 @@ class RegexEngine:
                 self.template = self.template[1:]
                 self.match_from_start = True
 
-            if self.template[-1] == "$":
-                # try to play with index in _string that is following $ in template.
-                if not RegexEngine.char_match(self.template[-2], self.string[-1]):
-                    return False
-
     @staticmethod
     def char_match(_regex_char, _char) -> bool:
         return any([not _regex_char, _regex_char == ".", _regex_char == _char])
 
-    def substring_match(self, _template=None, _string=None):
+    def substring_match(self, _template=None, _string=None) -> bool:
+
+        def asterisk_handler(_template, _string):
+            _next_step = 1 if _template[i] == "*" else 2
+            """repeative letter case"""
+            if _template[i - 1] == _string[i]:  # repeative letter case
+                _string = _string[:i] + _string[i::].strip(_template[i - 1])  # cut repittive leters in _string
+                _template = _template[:i] + _template[i + _next_step::]
+
+                return self.full_match(_string, _template)
+
+            elif _template[i - 1] == ".":
+                next_letter_index = _string.find(_template[i + 1])
+
+                # removing repittive chars.
+                _string = _string[:i] + _string[next_letter_index]
+                return self.full_match(_template, _string)
+
+            elif _template[i + 1] == _string[i]:  # abscent letter case
+                """abscent letter case """
+                # re-write variables?
+                return self.full_match(_template[i + 1::], _string[i::])
+
+            elif _template[i + 1] == _string[i]:  # 0 repititions, (letter presented only once here)
+                """0 repititions"""
+                return self.full_match(_template[i + next_step::], _string[i::])
+
+
+        def questionmark_handler(_template, _string):
+            if _template[i] == "?":
+                next_step = 1
+
+            elif len(_template) > i and _template[i + 1] == "?":
+                next_step = 2
+            else:
+                return False
+
+            return self.substring_match(_template[i + next_step:], _string[i:])
+
 
         for i in range(len(_string)):
-            match = True
+
+            match = True  # setting default value during each iteration
 
             try:
                 if not RegexEngine.char_match(_template[i], _string[i]):
                     match = False
 
+                    # line terminator sign
                     if _template[i] == "$" and _string[i]:
                         return False
 
@@ -41,40 +76,11 @@ class RegexEngine:
                             else self.full_match(_template[i+2:], _string[i+1:])
 
                     elif "?" in _template:
+                        return questionmark_handler(_template, _string)
 
-                        if _template[i] == "?":
-                            next_step = 1
-
-                        elif len(_template) > i and _template[i+1] == "?":
-                            next_step = 2
-                        else:
-                            return False
-
-                        return self.substring_match(_template[i+next_step:], _string[i:])
 
                     elif "*" in _template:
-                        next_step = 1 if _template[i] == "*" else 2
-                        """repeative letter case"""
-                        if _template[i - 1] == _string[i]:  # repeative letter case
-                            _string = _string[:i] + _string[i::].strip(_template[i - 1])  # cut repittive leters in _string
-                            _template = _template[:i] + _template[i + next_step::]
-                            return self.full_match(_string, _template)
-
-                        elif _template[i - 1] == ".":
-                            next_letter_index = _string.find(_template[i + 1])
-
-                            # removing repittive chars.
-                            _string = _string[:i] + _string[next_letter_index]
-                            return self.full_match(_template, _string)
-
-                        elif _template[i + 1] == _string[i]:  # abscent letter case
-                            """abscent letter case """
-                            # re-write variables?
-                            return self.full_match(_template[i + 1::], _string[i::])
-
-                        elif _template[i + 1] == _string[i]:  # 0 repititions, (letter presented only once here)
-                            """0 repititions"""
-                            return self.full_match(_template[i + next_step::], _string[i::])
+                        return asterisk_handler(_template, _string)
 
                     elif _template[i] == "+":
                         _template = _template.replace("+", "")
@@ -82,7 +88,6 @@ class RegexEngine:
                         return self.full_match(_template, _string)
                     return False
             except IndexError:
-
                 return match
         # in case all letters passed without any interventions
         return True
@@ -132,7 +137,6 @@ class RegexEngine:
 def main():
     try:
         template, string = input().split("|")
-        #template, string = "^no+|noooooooope".split("|")
     except ValueError:
         print("ERROR! Input should be like a|a. Please try again")
         return main()
