@@ -28,12 +28,10 @@ class RegexEngine:
             if _template[i - 1] == _string[i]:  # repeative letter case
                 new_string = _string[:i] + _string[i::].strip(_template[i - 1])  # cut repittive leters in _string
                 new_template = _template[:i] + _template[i + _next_step::]
-
                 return self.full_match(new_string, new_template)
 
             elif _template[i - 1] == ".":
                 next_letter_index = _string.find(_template[i + 1])
-
                 # removing repittive chars.
                 new_string = _string[:i] + _string[next_letter_index]
                 return self.full_match(_template, new_string)
@@ -58,11 +56,11 @@ class RegexEngine:
 
             return self.substring_match(_template[i + next_step:], _string[i:])
 
-        def plus_sign_handler(_template, _string):
-            _template = _template.replace("+", "")
+        def plus_sign_handler(template, string):
+            template = template.replace("+", "")
 
-            _string = _string[:i] + _string[i::].strip(_string[i - 1])  # right template version
-            return self.full_match(_template, _string)
+            string = string[:i] + string[i::].strip(_string[i - 1])  # right template version
+            return self.full_match(template, string)
 
         for i in range(len(_string)):
 
