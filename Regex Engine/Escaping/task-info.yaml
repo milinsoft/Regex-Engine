@@ -126,9 +126,24 @@ files:
         RegexTest('regex.regex').run_tests()
   learner_created: false
 feedback_link: https://hyperskill.org/learn/step/10244#comment
-status: Solved
+status: Failed
 feedback:
-  message: Well done! You've finished the project. Select a new project on <a href="https://hyperskill.org/projects">JetBrains
-    Academy</a> to continue learning.
-  time: Fri, 21 Jan 2022 14:40:01 UTC
+  message: |-
+    Exception in test #2
+
+    Traceback (most recent call last):
+      File ".idea/VirtualEnvironment/lib/python3.10/site-packages/hstest/testing/execution/main_module_executor.py", line 37, in _invoke_method
+        runpy.run_module(
+      File "Regex Engine/task/regex/regex.py", line 1, in <module>
+        from colorama import init, Fore  # disable before test as Jetbrains don't have it installed
+      File ".idea/VirtualEnvironment/lib/python3.10/site-packages/colorama/__init__.py", line 2, in <module>
+        from .initialise import init, deinit, reinit, colorama_text
+      File ".idea/VirtualEnvironment/lib/python3.10/site-packages/colorama/initialise.py", line 6, in <module>
+        from .ansitowin32 import AnsiToWin32
+      File ".idea/VirtualEnvironment/lib/python3.10/site-packages/colorama/ansitowin32.py", line 7, in <module>
+        from .winterm import WinTerm, WinColor, WinStyle
+      File ".idea/VirtualEnvironment/lib/python3.10/site-packages/colorama/winterm.py", line 2, in <module>
+        from . import win32
+    RecursionError: maximum recursion depth exceeded while calling a Python object
+  time: Sat, 22 Jan 2022 09:40:40 UTC
 record: -1

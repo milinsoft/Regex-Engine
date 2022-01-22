@@ -1,10 +1,10 @@
-#from colorama import init, Fore  # disable before test as Jetbrains don't have it installed
+from colorama import init, Fore  # disable before test as Jetbrains don't have it installed
 
 
 import sys
 
 sys.setrecursionlimit(50)
-#init(autoreset=True)
+init(autoreset=True)
 
 
 only_beginning = False
@@ -12,7 +12,7 @@ only_beginning = False
 
 # if len(template) < len(string) and template[-1] == "$", strip "$"!2
 
-def metachar_preprocessing(_string, _template):
+def string_scanner(_string, _template):
     if _template:
         if _template[0] in "*?+":
             print("REGEX PATERN ERROR. you can't have '*?+' at the beginning of the string\nTRY AGAIN")
@@ -23,6 +23,7 @@ def metachar_preprocessing(_string, _template):
             only_beginning = True
 
         if _template[-1] == "$":
+            # try to play with index in _string that is following $ in template.
             if not char_match(_template[-2], _string[-1]):
                 return "a", "b"  # temporarily fix to repr "FALSE"
     return _template, _string
@@ -40,39 +41,17 @@ def string_match(_template, _string):
         #print("loop starts with:", _template, _string)
         try:
             if not char_match(_template[i], _string[i]):
-
                 if _template[i] == '\\':
-                    #print("ORIG:", _template, _string)
-                    #print("NOT MATCH:", _template[i], _string[i])
-                    #print("TRYING TO MATCH:", _template[i+1], _string[i])
-
-                    next_step = 1 if _template[i+1] not in "?*+=." else 2
-                    "\\.$|end."
-
-
-                    # print(f"Input words: {_template[i+1]} {_string[i+1]} ")
-                    #print('match result:', _template[i+1] == _string[i])
-                    #print("new template and string can be: ", _template[i+2:], _string[i+1:], "\n")
 
                     if _template[i+1] != _string[i]:
-                        #print(_template[i+1], _string[i])
                         return False
                     else:
                         try:
-                            a = _template[i + 1 + 1]
+                            _template[i + 1 + 1]
                         except IndexError:
                             return True
 
-
                         if _template[i+2] == "$" or len(_template[i+1]) == i+1:
-                            return True
-
-                        #if len(_template) == i or len(_template) == i-1 and _template[i+1] == "$":
-                        #    return True
-
-                        # print("line 62:", _template[i+2], _string[i+1])
-                        # i += 1
-                        if _template[i+2] == "$" and not _string[i+1]:
                             return True
 
                         return full_match(_template[i+2:], _string[i+1:])
@@ -92,7 +71,6 @@ def string_match(_template, _string):
 
                 # maybe rethink next_symbol check and inplement below as well?
                 elif "*" in _template:
-                    # print(_template, _string)
 
                     next_step = 1 if _template[i] == "*" else 2
                     """repeative letter case"""
@@ -111,7 +89,7 @@ def string_match(_template, _string):
                         _string = _string[i + 1::]
                         # print(_template, _string)
 
-                        return string_match(_template, _string)
+                        return full_match(_template, _string)
 
                     elif _template[i + 1] == _string[i]:  # abscent letter case
                         """abscent letter case """
@@ -125,19 +103,13 @@ def string_match(_template, _string):
                     # print(_template, _string)
 
                     if _template[i] == "+":
-                        # print(_template, _string)
 
-                        # print("NEXT STEP IS:", next_step)
 
                         _template = _template[:i] + _template[i + 1:]
 
                         _string = _string[:i] + _string[i::].strip(_string[i - 1])  # right template version
-
                         i += 1
-                        # implement next letter check, and allow
 
-                        # print(_template, _string)
-                        # exit()
                         return string_match(_template, _string)
                     return False
 
@@ -155,8 +127,10 @@ def string_match(_template, _string):
 
 
 def template_without_optional_chars(_template):
-    symbols = {"*", "?"}
-    while any(["?" in _template, "*" in _template]):
+    """ with good string match function this may not be needed"""
+
+    symbols = {"*", "?", "$"}
+    while any(["?" in _template, "*" in _template, "$" in _template]):
         for s in symbols:
             index = _template.find(s)
             if index != -1:
@@ -169,7 +143,7 @@ def full_match(_template, _string):
     if _template and not _string:
         if template_without_optional_chars(_template):
             return False
-        # if _template is bigger than _string - checking if that is taht case after removing optional characters.
+        # if _template is bigger than _string - checking if that is that the case after removing optional characters.
         elif len(_template) > len(_string):
             if len(template_without_optional_chars(_template)) > len(_string):
                 return False
@@ -186,8 +160,6 @@ def full_match(_template, _string):
         i = 1
         # creating the loop and checking if template can be found in string
         while i < len(_string):
-            #print(Fore.RED + f"i == {i}")
-            #print(f"Iteration # {i}")
 
             if string_match(_template, _string[i:]):
                 return True
@@ -201,12 +173,10 @@ def full_match(_template, _string):
 def main():
     try:
         template, string = input().split("|")
-        #template, string = "\\.$|end.".split("|")
-
     except ValueError:
         print("ERROR! Input should be like a|a. Please try again")
         return main()
-    template, string = metachar_preprocessing(string, template)
+    template, string = string_scanner(string, template)
 
     print(full_match(template, string))
 
@@ -239,7 +209,7 @@ def run_tests():
 
     for pair in test_pool.keys():
         template, string = pair.split("|")
-        template, string = metachar_preprocessing(string, template)
+        template, string = string_scanner(string, template)
         # print(f"templ: {template}, str: {string}, expected result {test_pool[pair]}, actual result: {full_match(template, string)}")
         print(f"{pair} {Fore.GREEN}passed" if full_match(template, string) == test_pool[
             pair] else f"{pair} {Fore.RED}failed")
