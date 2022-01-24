@@ -125,13 +125,10 @@ files:
     if __name__ == '__main__':
         RegexTest('regex.regex').run_tests()
   learner_created: false
-- name: regex/t.py
-  visible: true
-  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/10244#comment
 status: Solved
 feedback:
   message: Well done! You've finished the project. Select a new project on <a href="https://hyperskill.org/projects">JetBrains
     Academy</a> to continue learning.
-  time: Sat, 22 Jan 2022 21:21:53 UTC
+  time: Mon, 24 Jan 2022 17:39:38 UTC
 record: -1
